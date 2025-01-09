@@ -5,26 +5,11 @@ import {
   Button,
   Input,
 } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 export function Layanan() {
-  const [layanan, setLayanan] = useState([
-    {
-      id: 1,
-      name: "Layanan Web Development",
-      deskripsi: "Membangun website profesional dengan desain modern.",
-      poto_1: "web1.jpg",
-      poto_2: "web2.jpg",
-    },
-    {
-      id: 2,
-      name: "Layanan Mobile App",
-      deskripsi: "Pengembangan aplikasi mobile untuk iOS dan Android.",
-      poto_1: "mobile1.jpg",
-      poto_2: "mobile2.jpg",
-    },
-  ]);
-
+  const [layanan, setLayanan] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
     name: "",
@@ -34,58 +19,77 @@ export function Layanan() {
     poto_1Preview: "",
     poto_2Preview: "",
   });
-
   const [isEditing, setIsEditing] = useState(false);
 
-  // Handle form input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Fetch data from API
+  const fetchAllLayanan = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/titles`);
+      setLayanan(response.data.data);
+    } catch (error) {
+      console.error("Error fetching layanan:", error);
+    }
   };
 
-  // Handle file upload changes
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
+  const handleSubmitLayanan = async () => {
+    // Cek apakah semua kolom dan foto valid
+    if (!formData.name || !formData.deskripsi) {
+      alert("Harap lengkapi semua kolom.");
+      return;
+    }
+  
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append("name", formData.name);
+    formDataToSubmit.append("deskripsi", formData.deskripsi);
+  
+    // Only append the photos if they were changed
+    if (formData.poto_1) {
+      formDataToSubmit.append("poto_1", formData.poto_1);
+    }
+    if (formData.poto_2) {
+      formDataToSubmit.append("poto_2", formData.poto_2);
+    }
+  
+    try {
+      if (isEditing) {
+        formDataToSubmit.append("_method", "PUT");
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/titles/${formData.id}`,
+          formDataToSubmit,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else {
+        await axios.post(`${import.meta.env.VITE_API_URL}/titles`, formDataToSubmit, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      }
+      fetchAllLayanan();
+      setIsEditing(false);
+      setFormData({
+        id: null,
+        name: "",
+        deskripsi: "",
+        poto_1: null,
+        poto_2: null,
+        poto_1Preview: "",
+        poto_2Preview: "",
+      });
+    } catch (error) {
+      console.error("Error submitting layanan:", error);
+    }
+  };
+  
+
+  // Handle file change
+  const handleFileChange = (e, field) => {
+    const { files } = e.target;
     if (files && files[0]) {
       setFormData({
         ...formData,
-        [name]: files[0],
-        [`${name}Preview`]: URL.createObjectURL(files[0]),
+        [field]: files[0],
+        [`${field}Preview`]: URL.createObjectURL(files[0]),
       });
     }
-  };
-
-  // Handle add or update data
-  const handleSubmit = () => {
-    if (isEditing) {
-      setLayanan(
-        layanan.map((item) =>
-          item.id === formData.id
-            ? { ...formData, poto_1: formData.poto_1Preview, poto_2: formData.poto_2Preview }
-            : item
-        )
-      );
-      setIsEditing(false);
-    } else {
-      setLayanan([
-        ...layanan,
-        {
-          ...formData,
-          id: layanan.length ? layanan[layanan.length - 1].id + 1 : 1,
-          poto_1: formData.poto_1Preview,
-          poto_2: formData.poto_2Preview,
-        },
-      ]);
-    }
-    setFormData({
-      id: null,
-      name: "",
-      deskripsi: "",
-      poto_1: null,
-      poto_2: null,
-      poto_1Preview: "",
-      poto_2Preview: "",
-    });
   };
 
   // Handle edit data
@@ -100,15 +104,26 @@ export function Layanan() {
     setIsEditing(true);
   };
 
-  // Handle delete data
-  const handleDelete = (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-      setLayanan(layanan.filter((item) => item.id !== id));
+  // Hapus Layanan
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus layanan ini?")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/titles/${id}`);
+        fetchAllLayanan();
+      } catch (error) {
+        console.error("Error deleting layanan:", error);
+        alert("Gagal menghapus layanan.");
+      }
     }
-  };
+  };  
+
+  useEffect(() => {
+    fetchAllLayanan();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      {/* Form Layanan */}
       <Card className="mb-6">
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
@@ -119,18 +134,18 @@ export function Layanan() {
               label="Nama"
               name="name"
               value={formData.name}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
             <Input
               label="Deskripsi"
               name="deskripsi"
               value={formData.deskripsi}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
             />
             <Input
               type="file"
               name="poto_1"
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e, "poto_1")}
             />
             {formData.poto_1Preview && (
               <img
@@ -142,7 +157,7 @@ export function Layanan() {
             <Input
               type="file"
               name="poto_2"
-              onChange={handleFileChange}
+              onChange={(e) => handleFileChange(e, "poto_2")}
             />
             {formData.poto_2Preview && (
               <img
@@ -154,8 +169,7 @@ export function Layanan() {
           </div>
           <div className="flex justify-end gap-4 mt-4">
             <Button
-              color={isEditing ? "blue" : "green"}
-              onClick={handleSubmit}
+              onClick={handleSubmitLayanan}
               className="rounded-md"
             >
               {isEditing ? "Update" : "Tambah"}

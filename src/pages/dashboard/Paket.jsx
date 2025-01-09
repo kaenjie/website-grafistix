@@ -1,38 +1,9 @@
-import {
-  Card,
-  CardBody,
-  Typography,
-  Button,
-  Input,
-} from "@material-tailwind/react";
+import { Card, CardBody, Typography, Button, Input } from "@material-tailwind/react";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export function Paket() {
-  const [paket, setPaket] = useState([
-    {
-      id: 1,
-      name: "Paket A",
-      description: "Paket A menyediakan layanan web development.",
-      price: "500000",
-      is_active: true,
-    },
-    {
-      id: 2,
-      name: "Paket B",
-      description: "Paket B menyediakan layanan mobile app development.",
-      price: "750000",
-      is_active: false,
-    },
-    {
-      id: 3,
-      name: "Paket C",
-      description: "Paket C menawarkan desain grafis dan branding.",
-      price: "300000",
-      is_active: true,
-    },
-  ]);
+  const [paket, setPaket] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
     name: "",
@@ -41,53 +12,90 @@ export function Paket() {
     is_active: true,
   });
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate(); // Hook untuk navigasi
+
+  // Fetch data paket
+  const fetchAllPaket = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/packages`);
+      setPaket(response.data.data);
+    } catch (error) {
+      console.error("Error fetching paket:", error);
+    }
+  };
 
   // Handle form input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle add or update data
-  const handleSubmit = () => {
-    if (isEditing) {
-      setPaket(
-        paket.map((item) =>
-          item.id === formData.id ? { ...formData } : item
-        )
-      );
-      setIsEditing(false);
-    } else {
-      setPaket([
-        ...paket,
-        {
-          ...formData,
-          id: paket.length ? paket[paket.length - 1].id + 1 : 1,
-        },
-      ]);
-    }
+    const { name, value, type, checked } = e.target;
     setFormData({
-      id: null,
-      name: "",
-      description: "",
-      price: "",
-      is_active: true,
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,  // Handle checkbox separately
     });
   };
 
-  // Handle edit data
-  const handleEdit = (data) => {
-    setFormData(data);
+  // Handle add or update paket
+  const handleSubmit = async () => {
+    // Cek apakah semua kolom valid
+    if (!formData.name || !formData.description || !formData.price) {
+      alert("Harap lengkapi semua kolom.");
+      return;
+    }
+
+    const dataToSubmit = {
+      name: formData.name,
+      description: formData.description,
+      price: formData.price,
+      is_active: formData.is_active,
+    };
+
+    try {
+      if (isEditing) {
+        // Jika edit, lakukan PUT request
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/packages/${formData.id}`,
+          dataToSubmit
+        );
+      } else {
+        // Jika tambah, lakukan POST request
+        await axios.post(`${import.meta.env.VITE_API_URL}/packages`, dataToSubmit);
+      }
+
+      // Refetch data setelah berhasil submit
+      fetchAllPaket();
+      setFormData({
+        id: null,
+        name: "",
+        description: "",
+        price: "",
+        is_active: true,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error submitting paket:", error);
+    }
+  };
+
+  // Handle edit paket
+  const handleEdit = (item) => {
+    setFormData(item);
     setIsEditing(true);
   };
 
-  // Handle delete data
-  const handleDelete = (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-      setPaket(paket.filter((item) => item.id !== id));
+  // Handle delete paket
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus paket ini?")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/packages/${id}`);
+        fetchAllPaket();
+      } catch (error) {
+        console.error("Error deleting paket:", error);
+      }
     }
   };
+
+  // Fetch paket data on component mount
+  useEffect(() => {
+    fetchAllPaket();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -121,7 +129,7 @@ export function Paket() {
                 type="checkbox"
                 name="is_active"
                 checked={formData.is_active}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                onChange={handleChange}
               />
               <label className="ml-2">Aktif</label>
             </div>
@@ -179,44 +187,36 @@ export function Paket() {
                 </tr>
               </thead>
               <tbody>
-                {paket.map((item) => {
-                  return (
-                    <tr key={item.id} className="hover:bg-gray-100">
-                      <td className="border-b border-gray-300 py-3 px-5">
-                        {item.name}
-                      </td>
-                      <td className="border-b border-gray-300 py-3 px-5">
-                        {item.description}
-                      </td>
-                      <td className="border-b border-gray-300 py-3 px-5">
-                        {item.price}
-                      </td>
-                      <td className="border-b border-gray-300 py-3 px-5">
-                        {item.is_active ? "Aktif" : "Tidak Aktif"}
-                      </td>
-                      <td className="border-b border-gray-300 py-3 px-5">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            color="green"
-                            onClick={() => handleEdit(item)}
-                            className="rounded-md"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            color="red"
-                            onClick={() => handleDelete(item.id)}
-                            className="rounded-md"
-                          >
-                            Hapus
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {paket.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-100">
+                    <td className="border-b border-gray-300 py-3 px-5">{item.name}</td>
+                    <td className="border-b border-gray-300 py-3 px-5">{item.description}</td>
+                    <td className="border-b border-gray-300 py-3 px-5">{item.price}</td>
+                    <td className="border-b border-gray-300 py-3 px-5">
+                      {item.is_active ? "Aktif" : "Tidak Aktif"}
+                    </td>
+                    <td className="border-b border-gray-300 py-3 px-5">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          color="green"
+                          onClick={() => handleEdit(item)}
+                          className="rounded-md"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          color="red"
+                          onClick={() => handleDelete(item.id)}
+                          className="rounded-md"
+                        >
+                          Hapus
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

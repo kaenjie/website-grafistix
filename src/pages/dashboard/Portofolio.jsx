@@ -1,104 +1,84 @@
-import { Card, CardBody, Typography, Button, Input, Textarea } from "@material-tailwind/react";
+import { Card, CardBody, Typography, Button, Input } from "@material-tailwind/react";
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import axios from "axios";
 
 export function Portofolio() {
-  const [portofolio, setPortofolio] = useState([]);
+  const [photos, setPhotos] = useState([]);
+
   const [formData, setFormData] = useState({
     id: null,
     title_id: "",
-    description: "",
     file_path: null,
   });
+
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch all portofolio
-  const fetchAllPortofolio = async () => {
+  // Fetch data portofolio
+  const fetchAllPhotos = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/photos`);
-      setPortofolio(response.data.data);
-      console.log(response);
+      setPhotos(response.data.data);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching photos:", error);
     }
   };
 
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchAllPortofolio();
-  }, []);
-
-  // Handle form input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handle file upload
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, file_path: e.target.files[0] });
-  };
-
-  // Handle add or update data
-  const handleSubmit = async () => {
+  // Tambah/Update Photos
+  const handleSubmitPhotos = async () => {
+    // Cek apakah title_id dan file_path valid
+    if (!formData.title_id || !formData.file_path) {
+      alert("Harap lengkapi ID Layanan dan pilih file.");
+      return;
+    }
+  
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append("title_id", formData.title_id);
+    formDataToSubmit.append("file_path", formData.file_path); // pastikan file path benar
+  
     try {
-      const formDataToSubmit = new FormData();
-      formDataToSubmit.append("title_id", formData.title_id);
-      if (formData.file_path) {
-        formDataToSubmit.append("file_path", formData.file_path);
-      }
-
       if (isEditing) {
+        formDataToSubmit.append("_method", "PUT");
         await axios.post(
-          `${import.meta.env.VITE_API_URL}/portfolios/${formData.id}`,
+          `${import.meta.env.VITE_API_URL}/photos/${formData.id}`,
           formDataToSubmit,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/portfolios`, formDataToSubmit, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/photos`, formDataToSubmit, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       }
-      fetchAllPortofolio();  // Fetch updated data
-      resetForm();  // Reset the form after submit
+      fetchAllPhotos();
+      setIsEditing(false);
+      setFormData({
+        id: null,
+        title_id: "",
+        file_path: null,
+      });
     } catch (error) {
-      console.log(error);
+      console.error("Error submitting photo:", error);
     }
-  };
+  }; 
 
-  // Handle edit data
-  const handleEdit = (item) => {
-    setFormData({
-      id: item.id,
-      title_id: item.title_id,
-      file_path: { name: item.file_path },
-    });
-    setIsEditing(true);
-  };
-
-  // Handle delete data
-  const handleDelete = async (id) => {
-    try {
-      if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-        await axios.delete(`${import.meta.env.VITE_API_URL}/portfolios/${id}`);
-        fetchAllPortofolio(); // Fetch updated data after delete
+  // Hapus Photo
+  const handleDeletePhoto = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/photos/${id}`);
+        fetchAllPhotos();
+      } catch (error) {
+        console.error("Error deleting photo:", error);
       }
-    } catch (error) {
-      console.log(error);
     }
   };
 
-  // Reset form
-  const resetForm = () => {
-    setFormData({ id: null, title_id: "", description: "", file_path: null });
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    fetchAllPhotos();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      {/* Form Tambah/Edit */}
+      {/* Form Portofolio */}
       <Card className="mb-6">
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
@@ -109,46 +89,60 @@ export function Portofolio() {
               label="ID Layanan"
               name="title_id"
               value={formData.title_id}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, title_id: e.target.value })}
             />
             <Input
               type="file"
-              label="Upload Gambar"
-              onChange={handleFileChange}
+              name="file_path"
+              onChange={(e) => {
+                const file = e.target.files[0];
+
+                // Validasi tipe file
+                if (file) {
+                  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+                  if (!allowedTypes.includes(file.type)) {
+                    alert("Hanya file dengan tipe jpeg, png, jpg, gif yang diperbolehkan.");
+                    return;
+                  }
+
+                  // Jika tipe file valid, lanjutkan
+                  setFormData({
+                    ...formData,
+                    file_path: file,
+                    filepreview: URL.createObjectURL(file),
+                  });
+                }
+              }}
             />
+            {formData.filepreview && (
+              <img
+                src={formData.filepreview}
+                alt="Preview"
+                className="w-1/2"
+              />
+            )}
           </div>
           <div className="flex justify-end gap-4 mt-4">
             <Button
-              color={isEditing ? "blue" : "green"}
-              onClick={handleSubmit}
-              className="rounded-md"
-            >
+              onClick={handleSubmitPhotos}
+              className="rounded-md">
               {isEditing ? "Update" : "Tambah"}
             </Button>
-            {isEditing && (
-              <Button
-                color="red"
-                onClick={resetForm}
-                className="rounded-md"
-              >
-                Batal
-              </Button>
-            )}
           </div>
         </CardBody>
       </Card>
 
-      {/* Daftar Portofolio */}
+      {/* Photos List */}
       <Card>
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
-            Daftar Portofolio
+           Daftar Portofolio
           </Typography>
           <div className="overflow-x-auto">
             <table className="w-full table-auto border-collapse">
               <thead>
                 <tr>
-                  {["ID Layanan", "File Path", "Aksi"].map((el) => (
+                  {["Service ID", "File Path", "Actions"].map((el) => (
                     <th
                       key={el}
                       className="border-b border-gray-300 py-3 px-5 text-left text-gray-600 font-semibold text-sm"
@@ -159,20 +153,24 @@ export function Portofolio() {
                 </tr>
               </thead>
               <tbody>
-                {portofolio.map((item) => (
+                {photos.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-100">
                     <td className="border-b border-gray-300 py-3 px-5">
                       {item.title_id}
                     </td>
                     <td className="border-b border-gray-300 py-3 px-5">
                       {item.file_path}
+                      <img src={`http://127.0.0.1:8000/storage/${item.file_path}`} alt="File" className="h-16 w-16 object-cover"/>
                     </td>
                     <td className="border-b border-gray-300 py-3 px-5">
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           color="green"
-                          onClick={() => handleEdit(item)}
+                          onClick={() => {
+                            setIsEditing(true)
+                            setFormData(item); 
+                          }}
                           className="rounded-md"
                         >
                           Edit
@@ -180,7 +178,7 @@ export function Portofolio() {
                         <Button
                           size="sm"
                           color="red"
-                          onClick={() => handleDelete(item.id)}
+                          onClick={() => handleDeletePhoto(item.id)}
                           className="rounded-md"
                         >
                           Hapus

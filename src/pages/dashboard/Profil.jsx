@@ -19,7 +19,7 @@ export function Profil() {
       })
       .catch((error) => {
         console.error(error);
-      });npm
+      });
   }, []);
   
   return (

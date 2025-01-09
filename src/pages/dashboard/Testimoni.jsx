@@ -5,119 +5,138 @@ import {
     Button,
     Input,
 } from "@material-tailwind/react";
-import React, { useState } from "react";
-
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * Testimoni component
- *
- * This component is used to display a list of testimonials and allow
- * the user to add, edit or delete testimonials.
- *
- * @param {object} props Component props
- * @param {object} props.testimoni List of testimonials
- * @param {function} props.setTestimoni Function to update the list of testimonials
- * @returns {ReactElement} The Testimoni component
- */
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 export function Testimoni() {
-    const [testimoni, setTestimoni] = useState([
-        {
-            id: 1,
-            nama: "John Doe",
-            instansi: "ABC Corp",
-            peran: "CEO",
-            pesan: "Great service, highly recommend!",
-            foto: "testimoni1.jpg",
-        },
-        {
-            id: 2,
-            nama: "Jane Smith",
-            instansi: "XYZ Ltd.",
-            peran: "Manager",
-            pesan: "Professional and reliable.",
-            foto: "testimoni2.jpg",
-        },
-    ]);
-
+    const [testimoni, setTestimoni] = useState([]);
     const [formData, setFormData] = useState({
         id: null,
-        nama: "",
-        instansi: "",
-        peran: "",
-        pesan: "",
-        foto: null,
-        fotoPreview: "",
+        name: "",
+        company: "",
+        role: "",
+        feedback: "",
+        image: null,
+        imagePreview: "",
     });
-
     const [isEditing, setIsEditing] = useState(false);
 
-    // Handle form input changes
+    // Fetch data testimoni
+    const fetchAllTestimoni = async () => {
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/testimonis`);
+            setTestimoni(response.data.data);
+        } catch (error) {
+            console.error("Error fetching testimoni:", error);
+        }
+    };
+
+    // Handle input changes for text fields
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
     };
 
-    // Handle file upload changes
+    // Handle file change (for image)
     const handleFileChange = (e) => {
-        const { name, files } = e.target;
-        if (files && files[0]) {
-            setFormData({
-                ...formData,
-                [name]: files[0],
-                [`${name}Preview`]: URL.createObjectURL(files[0]),
-            });
+        const file = e.target.files[0];
+        if (file) {
+            setFormData((prevState) => ({
+                ...prevState,
+                image: file,
+                imagePreview: URL.createObjectURL(file),
+            }));
         }
     };
 
-    // Handle add or update data
-    const handleSubmit = () => {
+    // Submit form data (Create/Update)
+    const handleSubmitTestimoni = async () => {
+        if (!formData.name && !formData.company && !formData.role && !formData.feedback && !formData.image) {
+            alert("Harap lengkapi minimal satu kolom.");
+            return;
+        }
+
+        const formDataToSubmit = new FormData();
+
+        // Append only the fields that have been changed
+        if (formData.name) formDataToSubmit.append("name", formData.name);
+        if (formData.company) formDataToSubmit.append("company", formData.company);
+        if (formData.role) formDataToSubmit.append("role", formData.role);
+        if (formData.feedback) formDataToSubmit.append("feedback", formData.feedback);
+        if (formData.image) formDataToSubmit.append("image", formData.image);
+
+        // Add _method field to indicate PUT for update
         if (isEditing) {
-            setTestimoni(
-                testimoni.map((item) =>
-                    item.id === formData.id
-                        ? { ...formData, foto: formData.fotoPreview }
-                        : item
-                )
-            );
+            formDataToSubmit.append("_method", "PUT");
+        }
+
+        try {
+            if (isEditing) {
+                // Update existing testimoni using POST with _method as PUT
+                await axios.post(
+                    `${import.meta.env.VITE_API_URL}/testimonis/${formData.id}`,
+                    formDataToSubmit,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+                alert("Testimoni berhasil diperbarui");
+            } else {
+                // Create new testimoni
+                await axios.post(
+                    `${import.meta.env.VITE_API_URL}/testimonis`,
+                    formDataToSubmit,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+            }
+            fetchAllTestimoni();
             setIsEditing(false);
-        } else {
-            setTestimoni([
-                ...testimoni,
-                {
-                    ...formData,
-                    id: testimoni.length ? testimoni[testimoni.length - 1].id + 1 : 1,
-                    foto: formData.fotoPreview,
-                },
-            ]);
+            setFormData({
+                id: null,
+                name: "",
+                company: "",
+                role: "",
+                feedback: "",
+                image: null,
+                imagePreview: "",
+            });
+        } catch (error) {
+            console.error("Error submitting testimoni:", error);
+            alert("Gagal mengirim testimoni");
         }
-        setFormData({
-            id: null,
-            nama: "",
-            instansi: "",
-            peran: "",
-            pesan: "",
-            foto: null,
-            fotoPreview: "",
-        });
     };
 
-    // Handle edit data
-    const handleEdit = (data) => {
-        setFormData({
-            ...data,
-            foto: null,
-            fotoPreview: data.foto,
-        });
+    // Handle edit functionality (Populate form with existing data)
+    const handleEdit = (item) => {
         setIsEditing(true);
+        setFormData({
+            id: item.id,
+            name: item.name,
+            company: item.company,
+            role: item.role,
+            feedback: item.feedback,
+            image: null,
+            imagePreview: item.image, // assuming image URL is stored in 'image'
+        });
     };
 
-    // Handle delete data
-    const handleDelete = (id) => {
+    // Handle delete functionality
+    const handleDelete = async (id) => {
         if (window.confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-            setTestimoni(testimoni.filter((item) => item.id !== id));
+            try {
+                await axios.delete(`${import.meta.env.VITE_API_URL}/testimonis/${id}`);
+                setTestimoni(testimoni.filter((item) => item.id !== id));
+            } catch (error) {
+                console.error("Error deleting testimoni:", error);
+                alert("Gagal menghapus testimoni");
+            }
         }
     };
+
+    useEffect(() => {
+        fetchAllTestimoni();
+    }, []);
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -129,36 +148,39 @@ export function Testimoni() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
                             label="Nama"
-                            name="nama"
-                            value={formData.nama}
+                            name="name"
+                            value={formData.name}
                             onChange={handleChange}
+                            disabled={isEditing && !formData.name}
                         />
                         <Input
                             label="Instansi"
-                            name="instansi"
-                            value={formData.instansi}
+                            name="company"
+                            value={formData.company}
                             onChange={handleChange}
+                            disabled={isEditing && !formData.company}
                         />
                         <Input
                             label="Peran"
-                            name="peran"
-                            value={formData.peran}
+                            name="role"
+                            value={formData.role}
                             onChange={handleChange}
+                            disabled={isEditing && !formData.role}
                         />
                         <Input
                             label="Pesan"
-                            name="pesan"
-                            value={formData.pesan}
+                            name="feedback"
+                            value={formData.feedback}
                             onChange={handleChange}
                         />
                         <Input
                             type="file"
-                            name="foto"
+                            name="image"
                             onChange={handleFileChange}
                         />
-                        {formData.fotoPreview && (
+                        {formData.imagePreview && (
                             <img
-                                src={formData.fotoPreview}
+                                src={formData.imagePreview}
                                 alt="Preview"
                                 className="h-20 w-20 rounded-md"
                             />
@@ -167,7 +189,7 @@ export function Testimoni() {
                     <div className="flex justify-end gap-4 mt-4">
                         <Button
                             color={isEditing ? "blue" : "green"}
-                            onClick={handleSubmit}
+                            onClick={handleSubmitTestimoni}
                             className="rounded-md"
                         >
                             {isEditing ? "Update" : "Tambah"}
@@ -179,12 +201,12 @@ export function Testimoni() {
                                     setIsEditing(false);
                                     setFormData({
                                         id: null,
-                                        nama: "",
-                                        instansi: "",
-                                        peran: "",
-                                        pesan: "",
-                                        foto: null,
-                                        fotoPreview: "",
+                                        name: "",
+                                        company: "",
+                                        role: "",
+                                        feedback: "",
+                                        image: null,
+                                        imagePreview: "",
                                     });
                                 }}
                                 className="rounded-md"
@@ -218,51 +240,49 @@ export function Testimoni() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {testimoni.map((item) => {
-                                    return (
-                                        <tr key={item.id} className="hover:bg-gray-100">
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                {item.nama}
-                                            </td>
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                {item.instansi}
-                                            </td>
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                {item.peran}
-                                            </td>
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                {item.pesan}
-                                            </td>
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                <img
-                                                    src={item.foto}
-                                                    alt="Foto Testimoni"
-                                                    className="h-16 w-16 rounded-md"
-                                                />
-                                            </td>
-                                            <td className="border-b border-gray-300 py-3 px-5">
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        size="sm"
-                                                        color="green"
-                                                        onClick={() => handleEdit(item)}
-                                                        className="rounded-md"
-                                                    >
-                                                        Edit
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        color="red"
-                                                        onClick={() => handleDelete(item.id)}
-                                                        className="rounded-md"
-                                                    >
-                                                        Hapus
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                {testimoni.map((item) => (
+                                    <tr key={item.id} className="hover:bg-gray-100">
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            {item.name}
+                                        </td>
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            {item.company}
+                                        </td>
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            {item.role}
+                                        </td>
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            {item.feedback}
+                                        </td>
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            <img
+                                                src={item.image}
+                                                alt="Foto Testimoni"
+                                                className="h-16 w-16 rounded-md"
+                                            />
+                                        </td>
+                                        <td className="border-b border-gray-300 py-3 px-5">
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    color="green"
+                                                    onClick={() => handleEdit(item)}
+                                                    className="rounded-md"
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    color="red"
+                                                    onClick={() => handleDelete(item.id)}
+                                                    className="rounded-md"
+                                                >
+                                                    Hapus
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
