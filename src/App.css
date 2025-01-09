@@ -1,0 +1,74 @@
+/* Pastikan halaman memiliki tinggi penuh */
+body, html {
+    height: 100%;
+    margin: 0;
+  }
+  
+  /* Wrapper utama Admin */
+  .admin-container {
+    display: flex;
+    flex-direction: row;  /* Sidebar di sebelah kiri, konten utama di sebelah kanan */
+    min-height: 100vh;
+    background-color: #f0f4f8;
+  }
+  
+  /* Sidebar dengan ukuran tetap */
+  .sidenav {
+    position: fixed;
+    width: 250px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background-color: #3a4e6e;
+    padding-top: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidenav-dark {
+    background-color: #1f2d45;
+  }
+  
+  /* Konten utama (kanan) */
+  .content-container {
+    margin-left: 250px;
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f9fafb;
+  }
+  
+  /* Navbar untuk menampung header */
+  .dashboard-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Styling footer */
+  .footer {
+    padding: 20px;
+    background-color: #f8f8f8;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  /* Responsif untuk layar kecil */
+  @media (max-width: 1024px) {
+    .admin-container {
+      flex-direction: column;
+    }
+    .sidenav {
+      position: relative;
+      width: 100%;
+      transform: translateX(-100%);  /* Sidebar tersembunyi untuk layar kecil */
+    }
+    .sidenav.open {
+      transform: translateX(0);  /* Sidebar muncul ketika dibuka */
+    }
+    .content-container {
+      margin-left: 0;
+    }
+  }
+  
