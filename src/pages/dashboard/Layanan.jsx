@@ -168,12 +168,12 @@ export function Layanan() {
             )}
           </div>
           <div className="flex justify-end gap-4 mt-4">
-            <Button
-              onClick={handleSubmitLayanan}
-              className="rounded-md"
-            >
-              {isEditing ? "Update" : "Tambah"}
-            </Button>
+          <Button
+            onClick={handleSubmitLayanan}
+            className={`rounded-md ${isEditing ? 'bg-blue-500 hover:bg-blue-600 text-white' : ''}`}
+          >
+            {isEditing ? "Update" : "Tambah"}
+          </Button>
             {isEditing && (
               <Button
                 color="red"

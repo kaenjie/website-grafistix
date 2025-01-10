@@ -162,46 +162,51 @@ export function Paket() {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      {/* Kategori Form */}
       <Card className="mb-6">
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
             {isEditingCategory ? "Edit Kategori" : "Tambah Kategori"}
           </Typography>
-          <Input
-            label="Nama Kategori"
-            name="name"
-            value={formDataCategory.name}
-            onChange={handleChangeCategory}
-          />
-          <Input
-            label="Harga Kategori"
-            name="price"
-            type="number"
-            value={formDataCategory.price}
-            onChange={handleChangeCategory}
-            className="mt-4"
-          />
-          <Button
-            color={isEditingCategory ? "blue" : "green"}
-            onClick={handleSubmitCategory}
-            className="mt-4"
-          >
-            {isEditingCategory ? "Update" : "Tambah"}
-          </Button>
-          {isEditingCategory && (
-            <Button color="red" onClick={resetFormCategory} className="ml-4 mt-4">
-              Batal
-            </Button>
-          )}
+          <div className="grid grid-cols-1 gap-4">
+            <Input
+              label="Nama Kategori"
+              name="name"
+              value={formDataCategory.name}
+              onChange={handleChangeCategory}
+            />
+            <Input
+              label="Harga Kategori"
+              name="price"
+              type="number"
+              value={formDataCategory.price}
+              onChange={handleChangeCategory}
+            />
+            <div className="flex justify-end gap-4">
+              <Button
+                color={isEditingCategory ? "blue" : "black"}
+                onClick={handleSubmitCategory}
+                className="w-auto max-w-xs px-6"
+              >
+                {isEditingCategory ? "Update" : "Tambah"}
+              </Button>
+              {isEditingCategory && (
+                <Button color="red" onClick={resetFormCategory} className="w-auto max-w-xs px-6">
+                  Batal
+                </Button>
+              )}
+            </div>
+          </div>
         </CardBody>
       </Card>
 
+      {/* Kategori List */}
       <Card className="mb-6">
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
             Daftar Kategori
           </Typography>
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr>
                 <th className="border-b py-3 px-5">Nama</th>
@@ -217,7 +222,7 @@ export function Paket() {
                   <td className="border-b py-3 px-5">
                     <Button
                       size="sm"
-                      color="blue"
+                      color="green"
                       onClick={() => handleEditCategory(cat)}
                       className="mr-2"
                     >
@@ -238,62 +243,66 @@ export function Paket() {
         </CardBody>
       </Card>
 
+      {/* Opsi Form */}
       <Card className="mb-6">
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
             {isEditingOption ? "Edit Opsi" : "Tambah Opsi"}
           </Typography>
-          <Input
-            label="Nama Opsi"
-            name="name"
-            value={formDataOption.name}
-            onChange={handleChangeOption}
-          />
-          <div className="mt-4">
-            <label className="block text-gray-700 mb-2">Kategori</label>
-            <select
-              name="package_id"
-              value={formDataOption.package_id}
+          <div className="grid grid-cols-1 gap-4">
+            <Input
+              label="Nama Opsi"
+              name="name"
+              value={formDataOption.name}
               onChange={handleChangeOption}
-              className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-500"
-            >
-              <option value="">Pilih Kategori</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mt-4">
+            />
+            <div>
+              <label className="block text-gray-700 mb-2">Kategori</label>
+              <select
+                name="package_id"
+                value={formDataOption.package_id}
+                onChange={handleChangeOption}
+                className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-500"
+              >
+                <option value="">Pilih Kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Switch
               label="Status"
               checked={formDataOption.status}
               name="status"
               onChange={handleChangeOption}
             />
+            <div className="flex justify-end gap-4">
+              <Button
+                color={isEditingOption ? "blue" : "black"}
+                onClick={handleSubmitOption}
+                className="w-auto max-w-xs px-6"
+              >
+                {isEditingOption ? "Update" : "Tambah"}
+              </Button>
+              {isEditingOption && (
+                <Button color="red" onClick={resetFormOption} className="w-auto max-w-xs px-6">
+                  Batal
+                </Button>
+              )}
+            </div>
           </div>
-          <Button
-            color={isEditingOption ? "blue" : "green"}
-            onClick={handleSubmitOption}
-            className="mt-4"
-          >
-            {isEditingOption ? "Update" : "Tambah"}
-          </Button>
-          {isEditingOption && (
-            <Button color="red" onClick={resetFormOption} className="ml-4 mt-4">
-              Batal
-            </Button>
-          )}
         </CardBody>
       </Card>
 
+      {/* Opsi List */}
       <Card>
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
             Daftar Opsi
           </Typography>
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
               <tr>
                 <th className="border-b py-3 px-5">Nama</th>
@@ -313,7 +322,7 @@ export function Paket() {
                   <td className="border-b py-3 px-5">
                     <Button
                       size="sm"
-                      color="blue"
+                      color="green"
                       onClick={() => handleEditOption(opt)}
                       className="mr-2"
                     >

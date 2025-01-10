@@ -139,6 +139,27 @@ export function Tabel() {
     }
   };
 
+  // Reset form when cancelling
+  const handleCancelTentang = () => {
+    setIsEditingTentang(false);
+    setFormDataTentang({
+      id: null,
+      judul: "",
+      deskripsi: "",
+      image: null,
+      filePreview: "",
+    });
+  };
+
+  const handleCancelBanner = () => {
+    setIsEditingBanner(false);
+    setFormDataBanner({
+      id: null,
+      file: null,
+      filePreview: "",
+    });
+  };
+
   useEffect(() => {
     fetchAllTentang();
     fetchAllBanner();
@@ -191,9 +212,16 @@ export function Tabel() {
               />
             )}
           </div>
-          <Button onClick={handleSubmitTentang} className="mt-4">
-            {isEditingTentang ? "Update" : "Tambah"}
-          </Button>
+          <div className="mt-4 flex justify-end gap-4">
+            <Button onClick={handleSubmitTentang} className="bg-black text-white">
+              {isEditingTentang ? "Update" : "Tambah"}
+            </Button>
+            {isEditingTentang && (
+              <Button onClick={handleCancelTentang} className="bg-red-500 text-white">
+                Batal
+              </Button>
+            )}
+          </div>
         </CardBody>
       </Card>
 
@@ -222,13 +250,13 @@ export function Tabel() {
                       className="h-16 w-16 object-cover"
                     />
                   </td>
-                  <td className="p-4 flex gap-2">
+                  <td className="p-4 flex gap-2 justify-end">
                     <Button
                       onClick={() => {
                         setIsEditingTentang(true);
                         setFormDataTentang(item);
                       }}
-                      className="bg-blue-500 text-white"
+                      className="bg-green-500 text-white"
                     >
                       Edit
                     </Button>
@@ -272,9 +300,16 @@ export function Tabel() {
               />
             )}
           </div>
-          <Button onClick={handleSubmitBanner} className="mt-4">
-            {isEditingBanner ? "Update" : "Tambah"}
-          </Button>
+          <div className="mt-4 flex justify-end gap-4">
+            <Button onClick={handleSubmitBanner} className="bg-black text-white">
+              {isEditingBanner ? "Update" : "Tambah"}
+            </Button>
+            {isEditingBanner && (
+              <Button onClick={handleCancelBanner} className="bg-red-500 text-white">
+                Batal
+              </Button>
+            )}
+          </div>
         </CardBody>
       </Card>
 
@@ -299,13 +334,13 @@ export function Tabel() {
                       className="h-16 w-16 object-cover"
                     />
                   </td>
-                  <td className="p-4 flex gap-2">
+                  <td className="p-4 flex gap-2 justify-end">
                     <Button
                       onClick={() => {
                         setIsEditingBanner(true);
                         setFormDataBanner(item);
                       }}
-                      className="bg-blue-500 text-white"
+                      className="bg-green-500 text-white"
                     >
                       Edit
                     </Button>

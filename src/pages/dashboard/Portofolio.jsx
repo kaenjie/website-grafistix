@@ -184,7 +184,7 @@ export function Portofolio() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          color="blue"
+                          color="green"
                           onClick={() => {
                             setIsEditing(true)
                             setFormData(item); 

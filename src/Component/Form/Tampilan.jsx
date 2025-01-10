@@ -14,13 +14,15 @@ const Tampilan = () => {
   });
 
   const [packageCategory, setPackageCategory] = useState([]);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState(""); // For success or error types
 
   const fetchAllPackages = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/package-categories`);
       setPackageCategory(response.data.data);
     } catch (error) {
-      console.error("Error fetching photos:", error);
+      console.error("Error fetching packages:", error);
     }
   };
 
@@ -35,14 +37,13 @@ const Tampilan = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Validasi pembayaran
     if (!formData.hasPaid) {
-      alert("Harap konfirmasi bahwa Anda telah melakukan pembayaran sebelum mengirim form.");
+      setAlertMessage("Harap konfirmasi bahwa Anda telah melakukan pembayaran.");
+      setAlertType("error");
       return;
     }
   
     try {
-      // Kirim data ke endpoint API
       const response = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
         method: "POST",
         headers: {
@@ -50,26 +51,34 @@ const Tampilan = () => {
         },
         body: JSON.stringify(formData),
       });
-    
+
       if (response.ok) {
         const data = await response.json();
-        alert("Checkout berhasil! Order ID: " + data.id);
-        // Mengarahkan pengguna ke halaman utama setelah berhasil
-        window.location.href = "/";  // Ganti dengan URL yang sesuai
+        setAlertMessage("Checkout berhasil! Terima kasih atas pemesanan Anda.");
+        setAlertType("success");
+        setFormData({
+          full_name: "",
+          email: "",
+          address: "",
+          city: "",
+          package_id: "",
+          payment_method: "",
+          hasPaid: false,
+        });
       } else {
         const errorData = await response.json();
-        alert("Terjadi kesalahan: " + errorData.message);
+        setAlertMessage("Terjadi kesalahan: " + errorData.message);
+        setAlertType("error");
       }
     } catch (error) {
-      alert("Terjadi kesalahan jaringan: " + error.message);
-    }    
+      setAlertMessage("Terjadi kesalahan jaringan: " + error.message);
+      setAlertType("error");
+    }
   };
-  
 
   useEffect(() => {
-    fetchAllPackages()
+    fetchAllPackages();
   }, []);
-
 
   const eWalletNumber = "083112080715 (REFA SETYAGAMA ABDILLAH)";
 
@@ -80,7 +89,22 @@ const Tampilan = () => {
           Pemesanan Paket Desain Grafis
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Alert Message */}
+        {alertMessage && (
+          <div
+            className={`mb-4 p-4 rounded-md text-center ${
+              alertType === "success"
+                ? "bg-green-100 text-green-800"
+                : alertType === "error"
+                ? "bg-red-100 text-red-800"
+                : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {alertMessage}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Full Name */}
           <div className="relative">
             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
@@ -95,7 +119,7 @@ const Tampilan = () => {
                 value={formData.full_name}
                 onChange={handleInputChange}
                 required
-                className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="pl-10 w-full rounded-md border-gray-300 shadow-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-300"
                 placeholder="Masukkan nama lengkap"
               />
             </div>
@@ -115,7 +139,7 @@ const Tampilan = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="pl-10 w-full rounded-md border-gray-300 shadow-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-300"
                 placeholder="Masukkan alamat email"
               />
             </div>
@@ -135,14 +159,14 @@ const Tampilan = () => {
                 value={formData.address}
                 onChange={handleInputChange}
                 required
-                className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="pl-10 w-full rounded-md border-gray-300 shadow-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-300"
                 placeholder="Masukkan alamat"
               />
             </div>
           </div>
 
-          {/* City and Paket */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* City and Package */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             <div className="relative">
               <label htmlFor="city" className="block text-sm font-medium text-gray-700">
                 Kota
@@ -156,7 +180,7 @@ const Tampilan = () => {
                   value={formData.city}
                   onChange={handleInputChange}
                   required
-                  className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="pl-10 w-full rounded-md border-gray-300 shadow-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-300"
                   placeholder="Masukkan nama kota"
                 />
               </div>
@@ -175,7 +199,7 @@ const Tampilan = () => {
                   value={formData.package_id}
                   onChange={handleInputChange}
                   required
-                  className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="pl-10 w-full rounded-md border-gray-300 shadow-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all duration-300"
                 >
                   <option value="" disabled>Pilih paket</option>
                   {packageCategory.map((paket) => (
@@ -193,7 +217,7 @@ const Tampilan = () => {
             <label className="block text-sm font-medium text-gray-700">
               Metode Pembayaran
             </label>
-            <div className="mt-2 space-y-2">
+            <div className="mt-2 space-y-4">
               {["ovo", "dana", "shopeepay"].map((method) => (
                 <div className="flex items-center" key={method}>
                   <input
@@ -203,9 +227,9 @@ const Tampilan = () => {
                     value={method}
                     checked={formData.payment_method === method}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                    className="h-5 w-5 text-purple-600 border-gray-300 focus:ring-purple-500 transition-all duration-300"
                   />
-                  <label htmlFor={method} className="ml-3 block text-sm font-medium text-gray-700">
+                  <label htmlFor={method} className="ml-3 text-sm font-medium text-gray-700">
                     {method.charAt(0).toUpperCase() + method.slice(1)}
                   </label>
                 </div>
@@ -214,26 +238,22 @@ const Tampilan = () => {
           </div>
 
           {/* Display Payment Number */}
-          <div className="bg-gray-100 p-4 rounded-md text-center">
-            <p className="text-gray-800">
-              Silakan transfer pembayaran ke nomor e-wallet berikut:
-            </p>
-            <p className="text-lg font-bold text-purple-600">{eWalletNumber}</p>
+          <div className="bg-gray-100 p-6 rounded-md text-center">
+            <p className="text-lg text-gray-800">Silakan transfer pembayaran ke nomor e-wallet berikut:</p>
+            <p className="text-lg font-semibold text-purple-600">{eWalletNumber}</p>
           </div>
 
           {/* Confirmation Checkbox */}
           <div>
-            <label className="flex items-center">
+            <label className="flex items-center text-sm text-gray-700">
               <input
                 type="checkbox"
                 name="hasPaid"
                 checked={formData.hasPaid}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                className="h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500 transition-all duration-300"
               />
-              <span className="ml-2 text-sm text-gray-700">
-                Saya telah melakukan pembayaran ke nomor di atas.
-              </span>
+              <span className="ml-2">Saya telah melakukan pembayaran ke nomor di atas.</span>
             </label>
           </div>
 
@@ -241,7 +261,7 @@ const Tampilan = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="w-full py-3 px-4 rounded-md bg-purple-600 text-white font-medium text-lg shadow-lg hover:bg-purple-700 focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-300"
             >
               Pesan Sekarang
             </button>
