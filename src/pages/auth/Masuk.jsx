@@ -33,8 +33,8 @@ export function Masuk() {
       // Simpan token atau data lainnya sesuai kebutuhan
       localStorage.setItem("token", data.access_token);
       
-      console.log("Navigating to /admin/beranda");
-      navigate("/admin/beranda", { replace: true });
+      console.log("Navigating to /admin/profil");
+      navigate("/admin/profil", { replace: true });
     } catch (err) {
       setError(err.message);
     }
