@@ -1,16 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { FaUser, FaEnvelope, FaMapMarkerAlt, FaCity, FaBoxOpen } from "react-icons/fa";
 
 const Tampilan = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    full_name: "",
     email: "",
     address: "",
     city: "",
-    paket: "",
-    paymentMethod: "ovo",
+    package_id: "",
+    payment_method: "",
     hasPaid: false,
   });
+
+  const [packageCategory, setPackageCategory] = useState([]);
+
+  const fetchAllPackages = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/package-categories`);
+      setPackageCategory(response.data.data);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -20,16 +32,44 @@ const Tampilan = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validasi pembayaran
     if (!formData.hasPaid) {
       alert("Harap konfirmasi bahwa Anda telah melakukan pembayaran sebelum mengirim form.");
       return;
     }
-
-    alert("Checkout berhasil!");
+  
+    try {
+      // Kirim data ke endpoint API
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+    
+      if (response.ok) {
+        const data = await response.json();
+        alert("Checkout berhasil! Order ID: " + data.id);
+        // Mengarahkan pengguna ke halaman utama setelah berhasil
+        window.location.href = "/";  // Ganti dengan URL yang sesuai
+      } else {
+        const errorData = await response.json();
+        alert("Terjadi kesalahan: " + errorData.message);
+      }
+    } catch (error) {
+      alert("Terjadi kesalahan jaringan: " + error.message);
+    }    
   };
+  
+
+  useEffect(() => {
+    fetchAllPackages()
+  }, []);
+
 
   const eWalletNumber = "083112080715 (REFA SETYAGAMA ABDILLAH)";
 
@@ -43,19 +83,16 @@ const Tampilan = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Full Name */}
           <div className="relative">
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
               Nama Lengkap
             </label>
             <div className="flex items-center mt-1">
               <FaUser className="text-gray-400 absolute left-3" />
               <input
                 type="text"
-                id="fullName"
-                name="fullName"
-                value={formData.fullName}
+                id="full_name"
+                name="full_name"
+                value={formData.full_name}
                 onChange={handleInputChange}
                 required
                 className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
@@ -66,10 +103,7 @@ const Tampilan = () => {
 
           {/* Email */}
           <div className="relative">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Alamat Email
             </label>
             <div className="flex items-center mt-1">
@@ -89,10 +123,7 @@ const Tampilan = () => {
 
           {/* Address */}
           <div className="relative">
-            <label
-              htmlFor="address"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
               Alamat
             </label>
             <div className="flex items-center mt-1">
@@ -113,10 +144,7 @@ const Tampilan = () => {
           {/* City and Paket */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="relative">
-              <label
-                htmlFor="city"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
                 Kota
               </label>
               <div className="flex items-center mt-1">
@@ -136,28 +164,25 @@ const Tampilan = () => {
 
             {/* Paket */}
             <div className="relative">
-              <label
-                htmlFor="paket"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="paket" className="block text-sm font-medium text-gray-700">
                 Paket
               </label>
               <div className="flex items-center mt-1">
                 <FaBoxOpen className="text-gray-400 absolute left-3" />
                 <select
                   id="paket"
-                  name="paket"
-                  value={formData.paket}
+                  name="package_id"
+                  value={formData.package_id}
                   onChange={handleInputChange}
                   required
                   className="pl-10 w-full rounded-md border-gray-300 shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                 >
-                  <option value="" disabled>
-                    Pilih paket
-                  </option>
-                  <option value="basic">Paket 1 (basic)</option>
-                  <option value="standard">Paket 2 (Standard)</option>
-                  <option value="premium">Paket 3 (Premium)</option>
+                  <option value="" disabled>Pilih paket</option>
+                  {packageCategory.map((paket) => (
+                    <option key={paket.id} value={paket.id}>
+                      {paket.name} - Rp {paket.price.toLocaleString('id-ID')}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -174,16 +199,13 @@ const Tampilan = () => {
                   <input
                     type="radio"
                     id={method}
-                    name="paymentMethod"
+                    name="payment_method"
                     value={method}
-                    checked={formData.paymentMethod === method}
+                    checked={formData.payment_method === method}
                     onChange={handleInputChange}
                     className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
                   />
-                  <label
-                    htmlFor={method}
-                    className="ml-3 block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor={method} className="ml-3 block text-sm font-medium text-gray-700">
                     {method.charAt(0).toUpperCase() + method.slice(1)}
                   </label>
                 </div>

@@ -17,7 +17,7 @@ function Beranda() {
   });
 
   useEffect(() => {
-    Axios.get("http://127.0.0.1:8000/api/titles")
+    Axios.get(`${import.meta.env.VITE_API_URL}/titles`)
       .then((response) => {
         console.log("data: ", response.data);
   

@@ -1,22 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
-import logo1 from "../../assets/imglogo/postlog1.png";
-import logo2 from "../../assets/imglogo/postlog2.png";
-import logo3 from "../../assets/imglogo/postlog3.png";
-import logo4 from "../../assets/imglogo/postlog4.png";
-import logo5 from "../../assets/imglogo/postlog5.png";
-import logo6 from "../../assets/imglogo/postlog6.png";
-import logo7 from "../../assets/imglogo/postlog7.png";
+import axios from "axios";  
 
 const Logo = () => {
-  const portfolioItems = [
-    { id: 1, image: logo1 },
-    { id: 2, image: logo2 },
-    { id: 3, image: logo3 },
-    { id: 4, image: logo4 },
-    { id: 5, image: logo5 },
-    { id: 6, image: logo6 },
-    { id: 7, image: logo7 },
-  ];
+  const [portfolioItems, setPortfolioItems] = useState([]);
+
+  const fetchAll = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/photos`);
+      setPortfolioItems(response.data.data);
+    } catch (error) {
+      console.error("Error fetching photos:", error);
+    }
+  };
 
   const scrollRef = useRef(null);
   const [hoveredId, setHoveredId] = useState(null);
@@ -24,6 +19,7 @@ const Logo = () => {
 
   // Memicu animasi masuk dengan delay seperti di Welcome
   useEffect(() => {
+    fetchAll();
     setTimeout(() => {
       setIsVisible(true);
     }, 500); // Delay untuk memulai animasi
@@ -75,7 +71,9 @@ const Logo = () => {
           className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide space-x-6 p-4"
           style={{ scrollbarWidth: "none" }} // Menyembunyikan scrollbar untuk Firefox
         >
-          {portfolioItems.map((item, index) => (
+          {portfolioItems
+          .filter(item => item.title_id === 2)
+          .map((item, index) => (
             <div
               key={item.id}
               className={`snap-center flex-none w-48 sm:w-64 md:w-80 h-64 sm:h-80 md:h-96 transition-all duration-1000 ease-out transform ${
@@ -89,7 +87,7 @@ const Logo = () => {
               onMouseLeave={() => setHoveredId(null)}
             >
               <img
-                src={item.image}
+                src={item.img_url}
                 alt=""
                 className={`w-full h-3/4 object-cover transition-opacity duration-500 ease-in-out transform ${
                   hoveredId && hoveredId !== item.id

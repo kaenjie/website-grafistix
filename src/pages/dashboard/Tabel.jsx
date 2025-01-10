@@ -217,7 +217,7 @@ export function Tabel() {
                   <td className="p-4">{item.deskripsi}</td>
                   <td className="p-4">
                     <img
-                      src={`http://127.0.0.1:8000/storage/${item.image}`}
+                      src={`${item.image}`}
                       alt="Gambar"
                       className="h-16 w-16 object-cover"
                     />
@@ -294,7 +294,7 @@ export function Tabel() {
                 <tr key={item.id} className="border-t">
                   <td className="p-4">
                     <img
-                      src={`http://127.0.0.1:8000/storage/${item.file}`}
+                      src={`${item.image_url}`}
                       alt="Banner"
                       className="h-16 w-16 object-cover"
                     />

@@ -88,12 +88,6 @@ export const routes = [
         path: "/masuk",
         element: <Masuk />,
       },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "daftar",
-        path: "/daftar",
-        element: <Daftar />,
-      },
     ],
   },
 ];

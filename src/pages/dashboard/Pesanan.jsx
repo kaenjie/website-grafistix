@@ -8,7 +8,7 @@ import {
   Option,
 } from "@material-tailwind/react";
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // Make sure to import axios
+import axios from "axios";
 
 export function Pesanan() {
   const [order, setOrder] = useState([]);
@@ -42,28 +42,18 @@ export function Pesanan() {
 
   // Handle add or update data
   const handleSubmit = async () => {
-    if (
-      !formData.full_name ||
-      !formData.email ||
-      !formData.address ||
-      !formData.city ||
-      !formData.payment_method ||
-      !formData.id_paket ||
-      !formData.order_date
-    ) {
-      alert("Harap lengkapi semua kolom.");
-      return;
+    // Filter out empty fields (only submit changed data)
+    const dataToSubmit = {};
+    for (const [key, value] of Object.entries(formData)) {
+      if (value && value !== "") {
+        dataToSubmit[key] = value;
+      }
     }
 
-    const dataToSubmit = {
-      full_name: formData.full_name,
-      email: formData.email,
-      address: formData.address,
-      city: formData.city,
-      payment_method: formData.payment_method,
-      id_paket: formData.id_paket,
-      order_date: formData.order_date,
-    };
+    if (Object.keys(dataToSubmit).length === 0) {
+      alert("Harap lengkapi setidaknya satu kolom.");
+      return;
+    }
 
     try {
       if (isEditing) {
@@ -84,9 +74,9 @@ export function Pesanan() {
         email: "",
         address: "",
         city: "",
-        payment_method: "OVO", // Reset to default payment method
-        id_paket: "",
-        order_date: new Date().toISOString().split("T")[0], // Reset to today's date
+        payment_method: "OVO", 
+        package_id: "",
+        order_date: new Date().toISOString().split("T")[0], 
       });
       setIsEditing(false);
     } catch (error) {
@@ -162,22 +152,14 @@ export function Pesanan() {
             </Select>
             <Input
               label="Paket"
-              name="id_paket"
-              value={formData.id_paket}
+              name="package_id"
+              value={formData.package_id}
               onChange={handleChange}
-            />
-            {/* Order Date (auto set to today's date) */}
-            <Input
-              label="Tanggal"
-              name="order_date"
-              value={formData.order_date}
-              onChange={handleChange}
-              type="date"
             />
           </div>
           <div className="flex justify-end gap-4 mt-4">
             <Button
-              color={isEditing ? "blue" : "green"}
+              color={isEditing ? "blue" : "black"}
               onClick={handleSubmit}
               className="rounded-md"
             >
@@ -195,7 +177,7 @@ export function Pesanan() {
                     address: "",
                     city: "",
                     payment_method: "OVO",
-                    id_paket: "",
+                    package_id: "",
                     order_date: new Date().toISOString().split("T")[0],
                   });
                 }}
@@ -225,7 +207,6 @@ export function Pesanan() {
                     "Kota",
                     "Metode Pembayaran",
                     "Paket",
-                    "Tanggal",
                     "Aksi",
                   ].map((el) => (
                     <th
@@ -245,8 +226,7 @@ export function Pesanan() {
                     <td className="border-b border-gray-300 py-3 px-5">{item.address}</td>
                     <td className="border-b border-gray-300 py-3 px-5">{item.city}</td>
                     <td className="border-b border-gray-300 py-3 px-5">{item.payment_method}</td>
-                    <td className="border-b border-gray-300 py-3 px-5">{item.id_paket}</td>
-                    <td className="border-b border-gray-300 py-3 px-5">{item.order_date}</td>
+                    <td className="border-b border-gray-300 py-3 px-5">{item.package_id}</td>
                     <td className="border-b border-gray-300 py-3 px-5">
                       <div className="flex gap-2">
                         <Button

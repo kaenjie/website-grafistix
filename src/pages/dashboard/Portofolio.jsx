@@ -25,7 +25,6 @@ export function Portofolio() {
 
   // Tambah/Update Photos
   const handleSubmitPhotos = async () => {
-    // Cek apakah title_id dan file_path valid
     if (!formData.title_id || !formData.file_path) {
       alert("Harap lengkapi ID Layanan dan pilih file.");
       return;
@@ -33,7 +32,7 @@ export function Portofolio() {
   
     const formDataToSubmit = new FormData();
     formDataToSubmit.append("title_id", formData.title_id);
-    formDataToSubmit.append("file_path", formData.file_path); // pastikan file path benar
+    formDataToSubmit.append("file_path", formData.file_path);
   
     try {
       if (isEditing) {
@@ -58,7 +57,7 @@ export function Portofolio() {
     } catch (error) {
       console.error("Error submitting photo:", error);
     }
-  }; 
+  };
 
   // Hapus Photo
   const handleDeletePhoto = async (id) => {
@@ -70,6 +69,15 @@ export function Portofolio() {
         console.error("Error deleting photo:", error);
       }
     }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setFormData({
+      id: null,
+      title_id: "",
+      file_path: null,
+    });
   };
 
   useEffect(() => {
@@ -125,9 +133,20 @@ export function Portofolio() {
           <div className="flex justify-end gap-4 mt-4">
             <Button
               onClick={handleSubmitPhotos}
-              className="rounded-md">
+              className={`${
+                isEditing ? "bg-blue-500" : "bg-black"
+              } text-white rounded-md`}
+            >
               {isEditing ? "Update" : "Tambah"}
             </Button>
+            {isEditing && (
+              <Button
+                onClick={handleCancelEdit}
+                className="bg-red-500 text-white rounded-md"
+              >
+                Batal
+              </Button>
+            )}
           </div>
         </CardBody>
       </Card>
@@ -136,13 +155,13 @@ export function Portofolio() {
       <Card>
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">
-           Daftar Portofolio
+            Daftar Portofolio
           </Typography>
           <div className="overflow-x-auto">
             <table className="w-full table-auto border-collapse">
               <thead>
                 <tr>
-                  {["Service ID", "File Path", "Actions"].map((el) => (
+                  {["ID Layanan", "File", "Aksi"].map((el) => (
                     <th
                       key={el}
                       className="border-b border-gray-300 py-3 px-5 text-left text-gray-600 font-semibold text-sm"
@@ -159,14 +178,13 @@ export function Portofolio() {
                       {item.title_id}
                     </td>
                     <td className="border-b border-gray-300 py-3 px-5">
-                      {item.file_path}
-                      <img src={`http://127.0.0.1:8000/storage/${item.file_path}`} alt="File" className="h-16 w-16 object-cover"/>
+                      <img src={`${item.file_path}`} alt="File" className="h-16 w-16 object-cover"/>
                     </td>
                     <td className="border-b border-gray-300 py-3 px-5">
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          color="green"
+                          color="blue"
                           onClick={() => {
                             setIsEditing(true)
                             setFormData(item); 

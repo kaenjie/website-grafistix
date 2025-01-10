@@ -188,7 +188,7 @@ export function Testimoni() {
                     </div>
                     <div className="flex justify-end gap-4 mt-4">
                         <Button
-                            color={isEditing ? "blue" : "green"}
+                            color={isEditing ? "blue" : "black"}
                             onClick={handleSubmitTestimoni}
                             className="rounded-md"
                         >
@@ -256,7 +256,7 @@ export function Testimoni() {
                                         </td>
                                         <td className="border-b border-gray-300 py-3 px-5">
                                             <img
-                                                src={item.image}
+                                                src={item.image_url}
                                                 alt="Foto Testimoni"
                                                 className="h-16 w-16 rounded-md"
                                             />

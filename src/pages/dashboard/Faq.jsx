@@ -111,7 +111,7 @@ import {
             </div>
             <div className="flex justify-end gap-4 mt-4">
               <Button
-                color={isEditing ? "blue" : "green"}
+                color={isEditing ? "blue" : "black"}
                 onClick={handleSubmit}
                 className="rounded-md"
               >

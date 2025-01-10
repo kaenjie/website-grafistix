@@ -231,14 +231,14 @@ export function Layanan() {
                       </td>
                       <td className="border-b border-gray-300 py-3 px-5">
                         <img
-                          src={item.poto_1}
+                          src={`${import.meta.env.VITE_URL}storage/title/${item.poto_1}`}
                           alt="Foto 1"
                           className="h-16 w-16 rounded-md"
                         />
                       </td>
                       <td className="border-b border-gray-300 py-3 px-5">
                         <img
-                          src={item.poto_2}
+                          src={`${import.meta.env.VITE_URL}storage/title/${item.poto_2}`}
                           alt="Foto 2"
                           className="h-16 w-16 rounded-md"
                         />

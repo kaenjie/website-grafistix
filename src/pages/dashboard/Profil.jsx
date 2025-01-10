@@ -13,7 +13,7 @@ export function Profil() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/users")
+      .get(`${import.meta.env.VITE_API_URL}/users`)
       .then((response) => {
         setData(response.data.data);
       })

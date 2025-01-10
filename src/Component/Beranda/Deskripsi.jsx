@@ -1,32 +1,60 @@
-import React, { useEffect, useRef } from "react";
-import foto4 from "../../assets/gimage.jpeg";
+import React, { useEffect, useState, useRef } from "react";
 import corel from "../../assets/corel.png";
 import ilustrator from "../../assets/ilustrator.png";
 import indesign from "../../assets/indesign.png";
 import netflixLogo from "../../assets/photoshop.png";
 import Inkscape from "../../assets/Inkscape.png";
 import affinity from "../../assets/affinity.png";
-import poster from "../../assets/poster bawah.png";
 import kualitas from "../../assets/iquliaty.png";
 import profesional from "../../assets/iprofesional.png";
 import kreatif from "../../assets/ikreatif.png";
 import totalitas from "../../assets/itotality.png";
 import ontime from "../../assets/iontime.png";
 import fastrespon from "../../assets/iresponse.png";
-import klien1 from "../../assets/klien/klien1.jpeg";
-import klien6 from "../../assets/klien/klien6.jpeg";
-import klien2 from "../../assets/klien/klien2.jpeg";
-import klien3 from "../../assets/klien/klien3.jpeg";
-import klien4 from "../../assets/klien/klien4.jpeg";
-import klien5 from "../../assets/klien/klien5.jpeg";
-import klien7 from "../../assets/klien/klien7.jpeg";
-import klien8 from "../../assets/klien/klien8.jpeg";
-import klien9 from "../../assets/klien/klien9.jpeg";
+import axios from "axios";
 
 const Deskripsi = () => {
   const testimonialRef = useRef(null);
 
+  const [tentang, setTentang] = useState([]);
+
+  const fetchFirstTentang = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/abouts-first`);
+      setTentang(response.data);
+    } catch (error) {
+      console.error("Error fetching Tentang Kami:", error);
+    }
+  };
+
+  const [banner, setBanner] = useState([]);
+
+  const fetchFirstBanner = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/banners-first`);
+        setBanner(response.data);
+        console.log(banner)
+      } catch (error) {
+        console.error("Error fetching Tentang Kami:", error);
+      }
+    }
+  
+    const [testi, setTesti] = useState([]);
+
+    const fetchTesti = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/testimonis`);
+        setTesti(response.data.data);
+      } catch (error) {
+        console.error("Error fetching Tentang Kami:", error);
+      }
+    }
+
   useEffect(() => {
+    fetchFirstTentang()
+    fetchFirstBanner ()
+    fetchTesti ()
+
     const container = testimonialRef.current;
 
     const scrollTestimonials = () => {
@@ -49,10 +77,10 @@ const Deskripsi = () => {
           {/* Text Section */}
           <div>
             <h1 className="font-helvetica font-bold text-5xl lg:text-6xl leading-tight mb-4 lg:mb-5 text-[#0D255E]">
-              Jasa Desain Grafis & Pengolahan Visual
+              {tentang.judul}
             </h1>
             <p className="font-sans text-lg lg:text-xl mb-5 lg:mb-8 text-justify">
-              Jasa Desain Grafis berpengalaman yang menangani klien dari berbagai daerah. Kami melayani secara online dan tatap muka langsung.
+              {tentang.deskripsi}
             </p>
             <a href="/portofolio" className="font-sans bg-[#14203D] text-[#CCDBFF] px-6 py-3 font-bold rounded-lg hover:text-white hover:bg-gradient-to-r from-[#132859] to-[#193678] shadow-lg">
               Selengkapnya
@@ -61,7 +89,7 @@ const Deskripsi = () => {
 
           {/* Image Section */}
           <div className="lg:w-[450px] lg:ml-10">
-            <img src={foto4} alt="Grafistix Hero" className="w-full h-auto rounded-lg shadow-xl hover:scale-105 transition-transform" />
+            <img src={`${tentang.image}`} alt="Grafistix Hero" className="w-full h-auto rounded-lg shadow-xl hover:scale-105 transition-transform" />
           </div>
         </div>
       </div>
@@ -120,76 +148,11 @@ const Deskripsi = () => {
         className="scroll-pl-6 mt-10 flex space-x-6 overflow-x-auto pb-8 scrollbar-hide"
         style={{ whiteSpace: "nowrap" }}
       >
-        {[
-          {
-            name: "Gumi",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Layanan desain grafis berkualitas.",
-            image: klien1
-          },
-          {
-            name: "Itis",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Pelayanan ramah, responsif, revisi cepat.",
-            image: klien2
-          },
-          {
-            name: "Plufy",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Portofolio mengesankan, keahlian beragam proyek.",
-            image: klien3 
-          },
-          {
-            name: "Qyuu",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Kualitas visual unggul, bisnis menonjol.",
-            image: klien4 
-          },
-          {
-            name: "Alex",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Efisien, tepat waktu, sesuai brief.",
-            image: klien5 
-          },
-          {
-            name: "Anggam",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Efisien, tepat waktu, sesuai brief.",
-            image: klien6 
-          },
-          {
-            name: "Muti",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Efisien, tepat waktu, sesuai brief.",
-            image: klien7 
-          },
-          {
-            name: "Gang",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Efisien, tepat waktu, sesuai brief.",
-            image: klien8 
-          },
-          {
-            name: "Octo",
-            company: "Universitas Negeri Surabaya",
-            role: "Mahasiswa",
-            feedback: "Efisien, tepat waktu, sesuai brief.",
-            image: klien9 
-          },
-          
-        ].map((client, index) => (
+        {testi.map((client, index) => (
           <div key={index} className="min-w-[200px] sm:min-w-[240px] md:min-w-[260px] lg:min-w-[280px] flex-shrink-0 inline-block">
             <div className="mx-auto max-w-xs flex flex-col items-center justify-between border rounded-lg p-4 shadow-md space-y-4">
               <img 
-                src={client.image} 
+                src={client.image_url} 
                 alt={client.name} 
                 className="w-16 h-16 object-cover rounded-full mb-2" 
               />
@@ -205,7 +168,7 @@ const Deskripsi = () => {
       </div>
       {/* Poster Section */}
       <div className="mt-12 md:mt-13 text-center">
-        <img className="w-[110%] md:w-[130%] lg:w-[115%] mx-auto rounded-lg shadow-lg hover:scale-105 transition-transform" src={poster} alt="Refa Setyagama Abdillah" />
+        <img className="w-[110%] md:w-[130%] lg:w-[115%] mx-auto rounded-lg shadow-lg hover:scale-105 transition-transform" src={`${banner.image_url}`} alt="Refa Setyagama Abdillah" />
       </div>
 
       {/* Background Animation Styles */}

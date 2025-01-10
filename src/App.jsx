@@ -13,11 +13,16 @@ import AddTestimoni from "./pages/Input/AddTestimoni";
 import AddTentangKami from "./pages/Input/AddTentangKami";
 import AddFAQ from "./pages/Input/AddFAQ";
 import AddBanner from "./pages/Input/AddBanner";
+import PrivateRoute from "./Component/PrivateRoute";
 
 function App() {
+  const isAuthenticated = localStorage.getItem('token') !== null;
+
   return (
     <Routes>
-      <Route path="/admin/*" element={<Admin />} />
+      <Route path="/admin/*" 
+      element={<PrivateRoute isAuthenticated={isAuthenticated} element={<Admin />} />}
+      />
       <Route path="/auth/*" element={<Auth />} />
       <Route path="*" element={<Navigate to="/admin/beranda" replace />} />
       <Route path="/" element={<Beranda />} />
