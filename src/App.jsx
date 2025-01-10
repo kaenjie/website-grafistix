@@ -24,7 +24,7 @@ function App() {
       element={<PrivateRoute isAuthenticated={isAuthenticated} element={<Admin />} />}
       />
       <Route path="/auth/*" element={<Auth />} />
-      <Route path="*" element={<Navigate to="/admin/beranda" replace />} />
+      <Route path="*" element={<Navigate to="/admin/profil" replace />} />
       <Route path="/" element={<Beranda />} />
       <Route path="/portofolio" element={<Portofolio />} />
       <Route path="/layanan" element={<Layanan />} />

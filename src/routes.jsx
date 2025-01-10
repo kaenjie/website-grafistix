@@ -22,12 +22,12 @@ export const routes = [
   {
     layout: "admin",
     pages: [
-      {
-        icon: <HomeIcon {...icon} />,
-        name: "beranda",
-        path: "/beranda",
-        element: <Beranda />,
-      },
+      // {
+      //   icon: <HomeIcon {...icon} />,
+      //   name: "beranda",
+      //   path: "/beranda",
+      //   element: <Beranda />,
+      // },
       {
         icon: <UserCircleIcon {...icon} />,
         name: "profil",

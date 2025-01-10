@@ -29,7 +29,7 @@ export function Admin() {
         <div className="mt-6">
           <Routes>
             {/* Redirect /admin to /admin/beranda */}
-            <Route path="/" element={<Navigate to="/admin/beranda" replace />} />
+            <Route path="/" element={<Navigate to="/admin/profil" replace />} />
             {routes.map(
               ({ layout, pages }) =>
                 layout === "admin" &&
