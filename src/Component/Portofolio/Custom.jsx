@@ -57,7 +57,7 @@ const Custom = () => {
           style={{ scrollbarWidth: 'none' }} // Hide scrollbar for Firefox
         >
           {portfolioItems
-          .filter(item => item.title_id === 1)
+          .filter(item => item.title_id === 2)
           .map((item, index) => (
             <div
               key={item.id}

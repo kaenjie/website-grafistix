@@ -213,9 +213,12 @@ export function Tabel() {
             )}
           </div>
           <div className="mt-4 flex justify-end gap-4">
-            <Button onClick={handleSubmitTentang} className="bg-black text-white">
-              {isEditingTentang ? "Update" : "Tambah"}
-            </Button>
+          <Button 
+            onClick={handleSubmitTentang} 
+            className={`text-white ${isEditingTentang ? "bg-blue-500" : "bg-black"}`}
+          >
+            {isEditingTentang ? "Update" : "Tambah"}
+          </Button>
             {isEditingTentang && (
               <Button onClick={handleCancelTentang} className="bg-red-500 text-white">
                 Batal
@@ -240,7 +243,7 @@ export function Tabel() {
             </thead>
             <tbody>
               {tentang.map((item) => (
-                <tr key={item.id} className="border-t">
+                <tr key={item.id} className="border-t hover:bg-gray-100">
                   <td className="p-4">{item.judul}</td>
                   <td className="p-4">{item.deskripsi}</td>
                   <td className="p-4">
@@ -301,9 +304,12 @@ export function Tabel() {
             )}
           </div>
           <div className="mt-4 flex justify-end gap-4">
-            <Button onClick={handleSubmitBanner} className="bg-black text-white">
-              {isEditingBanner ? "Update" : "Tambah"}
-            </Button>
+          <Button 
+            onClick={handleSubmitBanner} 
+            className={`text-white ${isEditingBanner ? "bg-blue-500" : "bg-black"}`}
+          >
+            {isEditingBanner ? "Update" : "Tambah"}
+          </Button>
             {isEditingBanner && (
               <Button onClick={handleCancelBanner} className="bg-red-500 text-white">
                 Batal
@@ -326,7 +332,7 @@ export function Tabel() {
             </thead>
             <tbody>
               {banner.map((item) => (
-                <tr key={item.id} className="border-t">
+                <tr key={item.id} className="border-t hover:bg-gray-100">
                   <td className="p-4">
                     <img
                       src={`${item.image_url}`}
@@ -334,7 +340,7 @@ export function Tabel() {
                       className="h-16 w-16 object-cover"
                     />
                   </td>
-                  <td className="p-4 flex gap-2 justify-end">
+                  <td className="p-4 flex gap-2 justify-start">
                     <Button
                       onClick={() => {
                         setIsEditingBanner(true);

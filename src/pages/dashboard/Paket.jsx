@@ -216,7 +216,7 @@ export function Paket() {
             </thead>
             <tbody>
               {categories.map((cat) => (
-                <tr key={cat.id}>
+                <tr key={cat.id} className="hover:bg-gray-100">
                   <td className="border-b py-3 px-5">{cat.name}</td>
                   <td className="border-b py-3 px-5">{cat.price}</td>
                   <td className="border-b py-3 px-5">
@@ -313,7 +313,7 @@ export function Paket() {
             </thead>
             <tbody>
               {options.map((opt) => (
-                <tr key={opt.id}>
+                <tr key={opt.id} className="hover:bg-gray-100">
                   <td className="border-b py-3 px-5">{opt.name}</td>
                   <td className="border-b py-3 px-5">{opt.category?.name || "-"}</td>
                   <td className="border-b py-3 px-5">

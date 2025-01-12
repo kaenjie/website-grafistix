@@ -72,7 +72,7 @@ const Logo = () => {
           style={{ scrollbarWidth: "none" }} // Menyembunyikan scrollbar untuk Firefox
         >
           {portfolioItems
-          .filter(item => item.title_id === 2)
+          .filter(item => item.title_id === 1)
           .map((item, index) => (
             <div
               key={item.id}

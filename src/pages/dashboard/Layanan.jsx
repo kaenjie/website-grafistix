@@ -21,7 +21,7 @@ export function Layanan() {
   });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch data from API
+  // Fetch data dari API
   const fetchAllLayanan = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/titles`);
@@ -42,7 +42,7 @@ export function Layanan() {
     formDataToSubmit.append("name", formData.name);
     formDataToSubmit.append("deskripsi", formData.deskripsi);
   
-    // Only append the photos if they were changed
+    // Hanya tambah foto jika ada perubahan
     if (formData.poto_1) {
       formDataToSubmit.append("poto_1", formData.poto_1);
     }
@@ -78,7 +78,6 @@ export function Layanan() {
       console.error("Error submitting layanan:", error);
     }
   };
-  
 
   // Handle file change
   const handleFileChange = (e, field) => {
@@ -89,10 +88,17 @@ export function Layanan() {
         [field]: files[0],
         [`${field}Preview`]: URL.createObjectURL(files[0]),
       });
+    } else {
+      // Jika file baru tidak dipilih, pertahankan preview file lama
+      setFormData({
+        ...formData,
+        [field]: null, // Tetapkan nilai null jika tidak ada file baru
+        [`${field}Preview`]: formData[`${field}Preview`], // Tetap gunakan URL lama
+      });
     }
   };
 
-  // Handle edit data
+  // Edit data
   const handleEdit = (data) => {
     setFormData({
       ...data,
@@ -198,6 +204,7 @@ export function Layanan() {
         </CardBody>
       </Card>
 
+      {/* tabel */}
       <Card>
         <CardBody>
           <Typography variant="h5" className="font-bold mb-4">

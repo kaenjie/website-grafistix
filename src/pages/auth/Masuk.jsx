@@ -32,6 +32,8 @@ export function Masuk() {
       const data = await response.json();
       // Simpan token atau data lainnya sesuai kebutuhan
       localStorage.setItem("token", data.access_token);
+
+      alert("Login berhasil! Selamat datang.");
       
       console.log("Navigating to /admin/profil");
       navigate("/admin/profil", { replace: true });
@@ -42,7 +44,7 @@ export function Masuk() {
 
   return (
     <section className="m-8 flex gap-4">
-      <div className="w-full lg:w-3/5 mt-24">
+      <div className="w-full mt-24">
         <div className="text-center">
           <Typography variant="h2" className="font-bold mb-4">Masuk</Typography>
           <Typography
@@ -108,7 +110,7 @@ export function Masuk() {
           </Button>
         </form>
       </div>
-      <div className="w-2/5 hidden lg:block">
+      <div className="w-1/2 hidden lg:block">
         <img
           src="/img/pattern.png"
           className="w-full object-cover rounded-3xl"

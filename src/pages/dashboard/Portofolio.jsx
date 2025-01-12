@@ -31,8 +31,12 @@ export function Portofolio() {
     }
   
     const formDataToSubmit = new FormData();
-    formDataToSubmit.append("title_id", formData.title_id);
-    formDataToSubmit.append("file_path", formData.file_path);
+    if (formData.title_id) {
+      formDataToSubmit.append("title_id", formData.title_id);
+    }
+    if (formData.file_path && formData.file_path instanceof File) {
+      formDataToSubmit.append("file_path", formData.file_path);
+    }    
   
     try {
       if (isEditing) {
@@ -55,7 +59,7 @@ export function Portofolio() {
         file_path: null,
       });
     } catch (error) {
-      console.error("Error submitting photo:", error);
+      console.error("Error submitting photo:", error.response?.data || error.message);
     }
   };
 
@@ -105,7 +109,6 @@ export function Portofolio() {
               onChange={(e) => {
                 const file = e.target.files[0];
 
-                // Validasi tipe file
                 if (file) {
                   const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
                   if (!allowedTypes.includes(file.type)) {
@@ -113,7 +116,6 @@ export function Portofolio() {
                     return;
                   }
 
-                  // Jika tipe file valid, lanjutkan
                   setFormData({
                     ...formData,
                     file_path: file,
@@ -122,10 +124,17 @@ export function Portofolio() {
                 }
               }}
             />
+            {!formData.filepreview && isEditing && (
+              <img
+                src={`${formData.file_path}`}
+                alt="Preview Lama"
+                className="w-1/2"
+              />
+            )}
             {formData.filepreview && (
               <img
                 src={formData.filepreview}
-                alt="Preview"
+                alt="Preview Baru"
                 className="w-1/2"
               />
             )}

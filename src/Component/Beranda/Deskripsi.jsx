@@ -150,7 +150,7 @@ const Deskripsi = () => {
       >
         {testi.map((client, index) => (
           <div key={index} className="min-w-[200px] sm:min-w-[240px] md:min-w-[260px] lg:min-w-[280px] flex-shrink-0 inline-block">
-            <div className="mx-auto max-w-xs flex flex-col items-center justify-between border rounded-lg p-4 shadow-md space-y-4">
+            <div className="mx-auto max-w-xs flex flex-col items-center justify-between border rounded-lg p-4 shadow-md space-y-4 overflow-hidden">
               <img 
                 src={client.image_url} 
                 alt={client.name} 
@@ -159,7 +159,7 @@ const Deskripsi = () => {
               <div className="text-center">
                 <h3 className="text-sm font-semibold text-gray-900">{client.name}</h3>
                 <p className="text-xs text-gray-600">{client.role} {client.company}</p>
-                <p className="mt-1 text-xs text-gray-800 leading-5">{client.feedback}</p>
+                <p className="mt-1 text-xs text-gray-800 leading-5 break-words max-w-full max-h-24 overflow-y-auto">{client.feedback}</p>
               </div>
             </div>
           </div>
@@ -168,7 +168,7 @@ const Deskripsi = () => {
       </div>
       {/* Poster Section */}
       <div className="mt-12 md:mt-13 text-center">
-        <img className="w-[110%] md:w-[130%] lg:w-[115%] mx-auto rounded-lg shadow-lg hover:scale-105 transition-transform" src={`${banner.image_url}`} alt="Refa Setyagama Abdillah" />
+        <img className="w-[110%] md:w-[130%] lg:w-[115%] mx-auto rounded-lg shadow-lg hover:scale-105 transition-transform" src={`${banner.image_url}`} alt="Banner" />
       </div>
 
       {/* Background Animation Styles */}
